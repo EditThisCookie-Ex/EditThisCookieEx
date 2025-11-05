@@ -1,10 +1,10 @@
-EditThisCookie
+EditThisCookie Ex
 ========================
 
 Description
 --------------
 
-EditThisCookie is a cookie manager. You can add, delete, edit, search, protect, and block cookies!
+EditThisCookie Ex is a cookie manager. You can add, delete, edit, search, protect, and block cookies!
 Inspired by the lack of good cookie managers in Google Chrome, I developed this small, simple, and extremely useful extension that allows you to do anything you'll ever need to do to cookies!
 
 * Delete any cookie
@@ -20,10 +20,10 @@ Inspired by the lack of good cookie managers in Google Chrome, I developed this 
 
 Contributing
 --------------
-- Improve the translations or add new languages [here](http://www.getlocalization.com/editthiscookie/)
+- Improve EditThisCookie Ex by creating an issue / pull request.
 
 
 How to Install
 --------------
 
-Install it on Chrome from [here](https://chrome.google.com/webstore/detail/edit-this-cookie/fngmhnnpilhplaeedifhccceomclgfbg)
+Install it on Chrome from going to the releases and downloading the latest zip, extract it and drag it into the Google extensions page (Developer mode required)
