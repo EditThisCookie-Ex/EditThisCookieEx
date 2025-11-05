@@ -1,3 +1,5 @@
+importScripts('utils.js');
+
 var showContextMenu = undefined;
 
 updateCallback = function () {
@@ -60,9 +62,9 @@ chrome.cookies.onChanged.addListener(function (changeInfo) {
         if (compareCookies(cookie, currentRORule)) {
             if (removed) {
                 chrome.cookies.get({
-                    'url': "http" + ((currentRORule.secure) ? "s" : "") + "://" + currentRORule.domain + currentRORule.path,
-                    'name': currentRORule.name,
-                    'storeId': currentRORule.storeId
+                    url: "http" + ((currentRORule.secure) ? "s" : "") + "://" + currentRORule.domain + currentRORule.path,
+                    name: currentRORule.name,
+                    storeId: currentRORule.storeId
                 }, function (currentCookie) {
                     if (compareCookies(currentCookie, currentRORule))
                         return;
@@ -75,28 +77,25 @@ chrome.cookies.onChanged.addListener(function (changeInfo) {
         }
     }
 
-    //Check if a blocked cookie was added
+    // Check if a blocked cookie was added
     if (!removed) {
         for (var i = 0; i < data.filters.length; i++) {
             var currentFilter = data.filters[i];
-            if (filterMatchesCookie(currentFilter, name, domain, value)) {
-                chrome.tabs.query(
-                    { active: true },
-                    function (tabs) {
-                        var url = tabs[0].url;
-                        var toRemove = {};
-                        toRemove.url = url;
-                        toRemove.url = "http" + ((cookie.secure) ? "s" : "") + "://" + cookie.domain + cookie.path;
-                        toRemove.name = name;
-                        chrome.cookies.remove(toRemove);
-                        ++data.nCookiesFlagged;
-                    });
+            if (filterMatchesCookie(currentFilter, cookie.name, cookie.domain, cookie.value)) {
+                chrome.tabs.query({ active: true }, function (tabs) {
+                    var toRemove = {
+                        url: "http" + ((cookie.secure) ? "s" : "") + "://" + cookie.domain + cookie.path,
+                        name: cookie.name
+                    };
+                    chrome.cookies.remove(toRemove);
+                    ++data.nCookiesFlagged;
+                });
             }
         }
     }
 
     if (!removed && preferences.useMaxCookieAge && preferences.maxCookieAgeType > 0) {	//Check expiration, if too far in the future shorten on user's preference
-        var maxAllowedExpiration = Math.round((new Date).getTime() / 1000) + (preferences.maxCookieAge * preferences.maxCookieAgeType);
+        var maxAllowedExpiration = Math.round(Date.now() / 1000) + (preferences.maxCookieAge * preferences.maxCookieAgeType);
         if (cookie.expirationDate !== undefined && cookie.expirationDate > maxAllowedExpiration + 60) {
             var newCookie = cookieForCreationFromFullCookie(cookie);
             if (!cookie.session)
@@ -109,15 +108,26 @@ chrome.cookies.onChanged.addListener(function (changeInfo) {
 
 function setContextMenu(show) {
     chrome.contextMenus.removeAll();
-    if (show) {
-        chrome.contextMenus.create({
-            "title": "EditThisCookie",
-            "contexts": ["page"],
-            "onclick": function (info, tab) {
-                showPopup(info, tab);
-            }
-        });
-    }
+    chrome.contextMenus.removeAll(function() {
+        if (chrome.runtime.lastError) {
+            console.error("Error removing context menus: ", chrome.runtime.lastError);
+        } else {
+            console.log("Context menus removed");
+        }
+        if (show) {
+            chrome.contextMenus.create({
+                id: "editThisCookieEx", // Unique identifier for the context menu item
+                title: "EditThisCookie Ex",
+                contexts: ["page"]
+            }, function() {
+                if (chrome.runtime.lastError) {
+                    console.error("Error creating context menu: ", chrome.runtime.lastError);
+                } else {
+                    console.log("Context menu created");
+                }
+            });
+        }
+    });
 }
 
 function setChristmasIcon() {

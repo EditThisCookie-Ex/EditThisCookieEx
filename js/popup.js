@@ -217,10 +217,12 @@ function createAccordionList(cks, callback, callbackArguments) {
     let createAccordionCallback = callback;
     let createAccordionCallbackArguments = callbackArguments;
 
-    try {
-        $("#cookiesList").accordion("destroy");
-    } catch (e) {
-        console.warn(e.message)
+    if ($("#cookiesList").hasClass("ui-accordion")) {
+        try {
+            $("#cookiesList").accordion("destroy");
+        } catch (e) {
+            console.warn(e.message);
+        }
     }
 
     if (cks === null)
@@ -450,7 +452,7 @@ function setEvents() {
     });
 
     $("#optionsButton").unbind().click(function () {
-        var urlToOpen = chrome.extension.getURL('options_main_page.html');
+        var urlToOpen = chrome.runtime.getURL('options_main_page.html');
         chrome.tabs.create({
             url: urlToOpen
         });
